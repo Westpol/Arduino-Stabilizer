@@ -57,5 +57,13 @@ void loop () {
     Serial.print(data.lost_frame);
     Serial.print("\t");
     Serial.println(data.failsafe);
+    check_failsafe();
+  }
+}
+
+
+void check_failsafe(){
+  if(data.failsafe == true){
+    aileron.write(90);
   }
 }
