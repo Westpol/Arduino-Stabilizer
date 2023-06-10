@@ -24,13 +24,14 @@
 */
 
 #include "sbus.h"
+#include <Servo.h>
 
 /* SBUS object, reading SBUS */
 bfs::SbusRx sbus_rx(&Serial1);
-/* SBUS object, writing SBUS */
-bfs::SbusTx sbus_tx(&Serial1);
 /* SBUS data */
 bfs::SbusData data;
+
+Servo aileron;
 
 void setup() {
   /* Serial to display data */
@@ -38,6 +39,8 @@ void setup() {
   while (!Serial) {}
   /* Begin the SBUS communication */
   sbus_rx.Begin();
+
+  aileron.attach(2);
 }
 
 void loop () {
@@ -49,6 +52,7 @@ void loop () {
       Serial.print(data.ch[i]);
       Serial.print("\t");
     }
+    aileron.write(map(data.ch[2],173,1810,0,180));
     /* Display lost frames and failsafe data */
     Serial.print(data.lost_frame);
     Serial.print("\t");
