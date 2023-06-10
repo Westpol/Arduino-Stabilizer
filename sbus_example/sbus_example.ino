@@ -38,7 +38,6 @@ void setup() {
   while (!Serial) {}
   /* Begin the SBUS communication */
   sbus_rx.Begin();
-  sbus_tx.Begin();
 }
 
 void loop () {
