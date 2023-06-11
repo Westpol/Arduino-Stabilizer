@@ -27,12 +27,6 @@
 
 #include <Servo.h>    //Servo Outputs
 
-#include <Adafruit_MPU6050.h>   //Gyro Inputs
-#include <Adafruit_Sensor.h>
-#include <Wire.h>
-
-Adafruit_MPU6050 mpu;   //setting up Gyro thing
-
 bfs::SbusRx sbus_rx(&Serial);    //setting up Sbus Rx and Sbus Object (&Serial1 for MEGA, &Serial for UNO)
 bfs::SbusData data;
 
@@ -68,22 +62,9 @@ void setup() {
   rudder.attach(4);
   aileron_left.attach(5);
   aileron_right.attach(6);
-
-  if (!mpu.begin()) {
-    Serial.println("Failed to find MPU6050 chip");
-    while (1) {
-      delay(10);
-    }
-  }
-
-  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-  mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
-  mpu.setFilterBandwidth(MPU6050_BAND_260_HZ);
 }
 
 void loop() {
-
-  update_gyro();
 
   if (sbus_rx.Read()) {
 
@@ -108,13 +89,4 @@ void check_failsafe(){
     aileron_left.writeMicroseconds(map(data.ch[3], 173, 1810, 1000, 2000));
     aileron_right.writeMicroseconds(map(data.ch[4], 173, 1810, 1000, 2000));
   }
-}
-
-void update_gyro(){
-  sensors_event_t a, g, temp;
-  mpu.getEvent(&a, &g, &temp);
-
-  float zGyro = g.gyro.z;
-  float yGyro = g.gyro.y;
-  float xGyro = g.gyro.x;
 }
