@@ -43,6 +43,20 @@ Servo aileron_right;
 Servo rudder;
 Servo throttle;
 
+int r_p = 0;
+int r_d = 0;
+int r_i = 0;
+
+int a_p = 0;
+int a_d = 0;
+int a_i = 0;
+
+int e_p = 0;
+int e_d = 0;
+int e_i = 0;
+
+float pi = 3.14159265358793;
+
 void setup() {
   Serial.begin(115200);
 
@@ -58,6 +72,7 @@ void setup() {
     Serial.println("Failed to find MPU6050 chip");
     while (1) {
       delay(10);
+    }
   }
 
   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
@@ -65,7 +80,7 @@ void setup() {
   mpu.setFilterBandwidth(MPU6050_BAND_260_HZ);
 }
 
-void loop () {
+void loop() {
 
   update_gyro();
 
@@ -97,4 +112,8 @@ void check_failsafe(){
 void update_gyro(){
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
+
+  float zGyro = g.gyro.z;
+  float yGyro = g.gyro.y;
+  float xGyro = g.gyro.x;
 }
