@@ -37,22 +37,8 @@ Servo aileron_right;
 Servo rudder;
 Servo throttle;
 
-int r_p = 0;
-int r_d = 0;
-int r_i = 0;
-
-int a_p = 0;
-int a_d = 0;
-int a_i = 0;
-
-int e_p = 0;
-int e_d = 0;
-int e_i = 0;
-
-float pi = 3.14159265358793;
-
 void setup() {
-  delay(5000);
+  delay(100);
 
   sbus_rx.Begin();
 
@@ -75,17 +61,5 @@ void loop() {
     aileron_left.writeMicroseconds(map(data.ch[3], 173, 1810, 1000, 2000));
     aileron_right.writeMicroseconds(map(data.ch[4], 173, 1810, 1000, 2000));
 
-  }
-  check_failsafe();
-}
-
-
-void check_failsafe(){
-  if(data.failsafe == true){
-    throttle.writeMicroseconds(map(data.ch[0],173,1810,1000,2000));
-    elevator.writeMicroseconds(map(data.ch[1], 173, 1810, 1000, 2000));
-    rudder.writeMicroseconds(map(data.ch[2], 173, 1810, 1000, 2000));
-    aileron_left.writeMicroseconds(map(data.ch[3], 173, 1810, 1000, 2000));
-    aileron_right.writeMicroseconds(map(data.ch[4], 173, 1810, 1000, 2000));
   }
 }
