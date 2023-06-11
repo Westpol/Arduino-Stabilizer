@@ -23,47 +23,78 @@
 * IN THE SOFTWARE.
 */
 
-#include "sbus.h"
-#include <Servo.h>
+#include "sbus.h"   //Serial Rx
 
-/* SBUS object, reading SBUS */
-bfs::SbusRx sbus_rx(&Serial1);
-/* SBUS data */
+#include <Servo.h>    //Servo Outputs
+
+#include <Adafruit_MPU6050.h>   //Gyro Inputs
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
+
+Adafruit_MPU6050 mpu;   //setting up Gyro thing
+
+bfs::SbusRx sbus_rx(&Serial1);    //setting up Sbus Rx and Sbus Object
 bfs::SbusData data;
 
-Servo aileron;
+
+Servo elevator;    //Setting up all servos
+Servo aileron_left;
+Servo aileron_right;
+Servo rudder;
+Servo throttle;
 
 void setup() {
-  /* Serial to display data */
   Serial.begin(115200);
-  while (!Serial) {}
-  /* Begin the SBUS communication */
+
   sbus_rx.Begin();
 
-  aileron.attach(2);
+  throttle.attach(2);
+  elevator.attach(3);
+  rudder.attach(4);
+  aileron_left.attach(5);
+  aileron_right.attach(6);
+
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+  }
+
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_260_HZ);
 }
 
 void loop () {
+
+  update_gyro();
+
   if (sbus_rx.Read()) {
-    /* Grab the received data */
+
     data = sbus_rx.data();
-    /* Display the received data */
-    for (int8_t i = 0; i < data.NUM_CH; i++) {
-      Serial.print(data.ch[i]);
-      Serial.print("\t");
-    }
-    aileron.write(map(data.ch[2],173,1810,0,180));
-    /* Display lost frames and failsafe data */
-    Serial.print(data.lost_frame);
-    Serial.print("\t");
-    Serial.println(data.failsafe);
-    check_failsafe();
+
+    throttle.writeMicroseconds(map(data.ch[0],173,1810,1000,2000));
+    elevator.writeMicroseconds(map(data.ch[1], 173, 1810, 1000, 2000));
+    rudder.writeMicroseconds(map(data.ch[2], 173, 1810, 1000, 2000));
+    aileron_left.writeMicroseconds(map(data.ch[3], 173, 1810, 1000, 2000));
+    aileron_right.writeMicroseconds(map(data.ch[4], 173, 1810, 1000, 2000));
+
   }
+  check_failsafe();
 }
 
 
 void check_failsafe(){
   if(data.failsafe == true){
-    aileron.write(90);
+    throttle.writeMicroseconds(map(data.ch[0],173,1810,1000,2000));
+    elevator.writeMicroseconds(map(data.ch[1], 173, 1810, 1000, 2000));
+    rudder.writeMicroseconds(map(data.ch[2], 173, 1810, 1000, 2000));
+    aileron_left.writeMicroseconds(map(data.ch[3], 173, 1810, 1000, 2000));
+    aileron_right.writeMicroseconds(map(data.ch[4], 173, 1810, 1000, 2000));
   }
+}
+
+void update_gyro(){
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
 }
