@@ -33,7 +33,7 @@
 
 Adafruit_MPU6050 mpu;   //setting up Gyro thing
 
-bfs::SbusRx sbus_rx(&Serial1);    //setting up Sbus Rx and Sbus Object
+bfs::SbusRx sbus_rx(&Serial);    //setting up Sbus Rx and Sbus Object (&Serial1 for MEGA, &Serial for UNO)
 bfs::SbusData data;
 
 
@@ -58,6 +58,7 @@ int e_i = 0;
 float pi = 3.14159265358793;
 
 void setup() {
+  delay(5000);
   Serial.begin(115200);
 
   sbus_rx.Begin();
