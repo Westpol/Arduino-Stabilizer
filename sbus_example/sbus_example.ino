@@ -53,7 +53,6 @@ float pi = 3.14159265358793;
 
 void setup() {
   delay(5000);
-  Serial.begin(115200);
 
   sbus_rx.Begin();
 
