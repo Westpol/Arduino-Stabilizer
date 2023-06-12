@@ -57,9 +57,12 @@ int e_i = 0;
 
 float pi = 3.14159265358793;
 
+float xDelta = 0;
+float yDelta = 0;
+float zDelta = 0;
+
 void setup() {
   delay(5000);
-  Serial.begin(115200);
 
   sbus_rx.Begin();
 
@@ -70,7 +73,6 @@ void setup() {
   aileron_right.attach(6);
 
   if (!mpu.begin()) {
-    Serial.println("Failed to find MPU6050 chip");
     while (1) {
       delay(10);
     }
@@ -79,11 +81,11 @@ void setup() {
   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
   mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_260_HZ);
+
+  gyro_calibration();
 }
 
 void loop() {
-
-  update_gyro();
 
   if (sbus_rx.Read()) {
 
@@ -110,11 +112,37 @@ void check_failsafe(){
   }
 }
 
-void update_gyro(){
+void update_gyro(float* x, float* y, float* z){
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
-  float zGyro = g.gyro.z;
-  float yGyro = g.gyro.y;
-  float xGyro = g.gyro.x;
+  float zGyro = g.gyro.z - zDelta;
+  float yGyro = g.gyro.y - yDelta;
+  float xGyro = g.gyro.x - xDelta;
+
+  *x += xGyro;
+  *y += yGyro;
+  *z += zGyro;
+}
+
+void gyro_calibration(){
+  elevator.writeMicroseconds(1900);
+  delay(1000);
+  unsigned long mill = millis() + 2000;
+  unsigned long iterations = 0;
+  float x, y, z;
+  while(mill > millis()){
+    update_gyro(&x, &y, &z);
+    iterations++;
+  }
+
+  xDelta = x / float(iterations);
+  yDelta = y / float(iterations);
+  zDelta = z / float(iterations);
+  elevator.writeMicroseconds(1500);
+  delay(500);
+
+  if(xDelta > 0.1 || yDelta > 0.1 || zDelta > 0.1){
+    while(1){}
+  }
 }
