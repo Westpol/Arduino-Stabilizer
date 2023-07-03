@@ -86,19 +86,19 @@ void setup() {
 }
 
 void loop() {
-
+  pid_loop();
   if (sbus_rx.Read()) {
 
     data = sbus_rx.data();
 
-    throttle.writeMicroseconds(map(data.ch[0],173,1810,1000,2000));
-    elevator.writeMicroseconds(map(data.ch[1], 173, 1810, 1000, 2000));
-    rudder.writeMicroseconds(map(data.ch[2], 173, 1810, 1000, 2000));
-    aileron_left.writeMicroseconds(map(data.ch[3], 173, 1810, 1000, 2000));
-    aileron_right.writeMicroseconds(map(data.ch[4], 173, 1810, 1000, 2000));
-
   }
   check_failsafe();
+
+  throttle.writeMicroseconds(map(data.ch[0],173,1810,1000,2000));
+  elevator.writeMicroseconds(map(data.ch[1], 173, 1810, 1000, 2000));
+  rudder.writeMicroseconds(map(data.ch[2], 173, 1810, 1000, 2000));
+  aileron_left.writeMicroseconds(map(data.ch[3], 173, 1810, 1000, 2000));
+  aileron_right.writeMicroseconds(map(data.ch[4], 173, 1810, 1000, 2000));
 }
 
 
@@ -145,4 +145,18 @@ void gyro_calibration(){
   if(xDelta > 0.1 || yDelta > 0.1 || zDelta > 0.1){
     while(1){}
   }
+}
+
+void pid_loop(){
+  
+}
+
+int maxmin(int lval, int lmin, int lmax){
+  if(lval < lmin){
+    return lmin;
+  }
+  if(lval > lmax){
+    return lmax;
+  }
+  return lval;
 }
