@@ -1,0 +1,1 @@
+the more the sticks are centered, the more authority the pid loop has, with full deflection, the loop gets completely overridden.

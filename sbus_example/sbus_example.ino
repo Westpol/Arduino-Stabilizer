@@ -87,7 +87,6 @@ void setup() {
 
 void loop() {
   int global_throttle, global_elevator, global_rudder, global_aileron_left, global_aileron_right;
-  pid_loop();
   if (sbus_rx.Read()) {
 
     data = sbus_rx.data();
@@ -100,6 +99,8 @@ void loop() {
   global_rudder = map(data.ch[2], 173, 1810, 1000, 2000);
   global_aileron_left = map(data.ch[3], 173, 1810, 1000, 2000);
   global_aileron_right = map(data.ch[4], 173, 1810, 1000, 2000);
+
+  pid_loop(&global_throttle, &global_elevator, &global_rudder, &global_aileron_left, &global_aileron_right);
 
   throttle.writeMicroseconds(global_throttle);
   elevator.writeMicroseconds(global_elevator);
@@ -154,8 +155,26 @@ void gyro_calibration(){
   }
 }
 
-void pid_loop(){
-  
+void pid_loop(int* thr, int* ele, int* rud, int* aill, int* ailr){
+  float x, y, z;
+  update_gyro(&x, &y, &z);
+
+  int ele_corr = 0;
+
+  ele_corr = maxmin(ele_corr, -250, 250);
+
+  if(ele > 1750){
+    ele_corr *= ((*ele - 2000) * -1) / 250;    //first inverted -250 till 0, then *(-1), then / 250
+  }
+  else if (ele < 1250) {
+    ele_corr *= (*ele - 1000) / 250;
+  }
+
+  *ele += ele_corr;
+
+  xDelta = x;
+  zDelta = z;
+  yDelta = y;
 }
 
 int maxmin(int lval, int lmin, int lmax){
