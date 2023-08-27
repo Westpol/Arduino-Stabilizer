@@ -128,9 +128,9 @@ void update_gyro(float* x, float* y, float* z){
   float yGyro = g.gyro.y - yDelta;
   float xGyro = g.gyro.x - xDelta;
 
-  *x += xGyro;
-  *y += yGyro;
-  *z += zGyro;
+  *x = xGyro;
+  *y = yGyro;
+  *z = zGyro;
 }
 
 void gyro_calibration(){
@@ -159,18 +159,18 @@ void pid_loop(int* thr, int* ele, int* rud, int* aill, int* ailr){
   float x, y, z;
   update_gyro(&x, &y, &z);
 
-  int ele_corr = 0;
+  int rud_corr = 0;
 
-  ele_corr = maxmin(ele_corr, -250, 250);
+  rud_corr = maxmin(rud_corr, -250, 250);
 
-  if(ele > 1750){
-    ele_corr *= ((*ele - 2000) * -1) / 250;    //first inverted -250 till 0, then *(-1), then / 250
+  if(*rud > 1750){
+    rud_corr *= ((*rud - 2000) * -1) / 250;    //first inverted -250 till 0, then *(-1), then / 250
   }
-  else if (ele < 1250) {
-    ele_corr *= (*ele - 1000) / 250;
+  else if (*rud < 1250) {
+    rud_corr *= (*rud - 1000) / 250;
   }
 
-  *ele += ele_corr;
+  *rud += rud_corr;
 
   xDelta = x;
   zDelta = z;
