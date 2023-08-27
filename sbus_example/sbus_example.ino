@@ -86,6 +86,7 @@ void setup() {
 }
 
 void loop() {
+  int global_throttle, global_elevator, global_rudder, global_aileron_left, global_aileron_right;
   pid_loop();
   if (sbus_rx.Read()) {
 
@@ -94,11 +95,17 @@ void loop() {
   }
   check_failsafe();
 
-  throttle.writeMicroseconds(map(data.ch[0],173,1810,1000,2000));
-  elevator.writeMicroseconds(map(data.ch[1], 173, 1810, 1000, 2000));
-  rudder.writeMicroseconds(map(data.ch[2], 173, 1810, 1000, 2000));
-  aileron_left.writeMicroseconds(map(data.ch[3], 173, 1810, 1000, 2000));
-  aileron_right.writeMicroseconds(map(data.ch[4], 173, 1810, 1000, 2000));
+  global_throttle = map(data.ch[0],173,1810,1000,2000);
+  global_elevator = map(data.ch[1], 173, 1810, 1000, 2000);
+  global_rudder = map(data.ch[2], 173, 1810, 1000, 2000);
+  global_aileron_left = map(data.ch[3], 173, 1810, 1000, 2000);
+  global_aileron_right = map(data.ch[4], 173, 1810, 1000, 2000);
+
+  throttle.writeMicroseconds(global_throttle);
+  elevator.writeMicroseconds(global_elevator);
+  rudder.writeMicroseconds(global_rudder);
+  aileron_left.writeMicroseconds(global_aileron_left);
+  aileron_right.writeMicroseconds(global_aileron_right);
 }
 
 
